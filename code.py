@@ -43,20 +43,63 @@ class Credits(State):
             menu.change_state(BadgeStates.MENU)
 
 
+
 class NameBadge(State):
 
+    colors = [
+        # Python Colors
+        0x4B8BBE,   # Python Blue
+        0xFFD43B,   # Python Yellow
+        # Vaporwave Colors
+        0x0ff,      # Cyan
+        0xff00ff,   # Pink
+        # Rainbow Colors
+        0xff0000,   # Red
+        0xFF7F00,   # Orange
+        0xFFFF00,   # Yellow
+        0x00FF00,   # Green
+        0x0000FF,   # Blue
+        0x2E2B5F,   # Indigo,
+        0x8B00FF,   # Violet,
+    ]
+
+    current_index = 0
+    led_on = False
+
     def display(self, pybadger):
+        current_color = self.colors[self.current_index]
         pybadger.show_badge(
+            background_color=current_color,
             name_string="Pythonista",
             hello_scale=2,
             my_name_is_scale=2,
-            name_scale=2)
+            name_scale=2
+        )
+
+        if self.led_on:
+            pybadger.pixels.brightness = 0.1
+            pybadger.pixels.fill(current_color)
 
     def handle_event(self, pybadger):
-        if any([
+        if pybadger.button.left:
+            print("Left button pressed")
+            self.current_index = (self.current_index - 1) % len(self.colors)
+            self.display(pybadger)
+        elif pybadger.button.right:
+            print("Right button pressed")
+            self.current_index = (self.current_index + 1) % len(self.colors)
+            self.display(pybadger)
+        elif pybadger.button.up:
+            self.led_on = True
+            self.display(pybadger)
+        elif pybadger.button.down:
+            self.led_on = False
+            pybadger.pixels.fill((0, 0, 0))
+        elif any([
                 pybadger.button.b,
                 pybadger.button.start,
                 pybadger.button.select]):
+            pybadger.pixels.fill((0, 0, 0))
             menu.change_state(BadgeStates.MENU)
 
 
@@ -66,8 +109,6 @@ class QrCode(State):
         qr_code = adafruit_miniqr.QRCode(qr_type=2)
         qr_code.add_data(bytearray(url))
         qr_code.make()
-
-
 
         palette = displayio.Palette(2)
         palette[0] = 0xFFFFFF
@@ -80,7 +121,6 @@ class QrCode(State):
             x=int(qr_bitmap.width / 2),
             y=2,
         )
-
 
         qr_code = displayio.Group(scale=3)
         qr_code.append(qr_img)
@@ -102,6 +142,42 @@ class QrCode(State):
                 pybadger.button.start,
                 pybadger.button.select]):
             menu.change_state(BadgeStates.MENU)
+
+
+class SocialBattery(State):
+
+    social_images = [
+        ("images/social_battery/full.bmp", (0, 255, 0)),
+        ("images/social_battery/low.bmp", (255, 255, 0)),
+        ("images/social_battery/empty.bmp", (255, 0, 0)),
+    ]
+
+    current_index = 0
+
+    def display(self, pybadger):
+        image_file, color = self.social_images[self.current_index]
+        pybadger.show_business_card(
+            image_name=image_file
+        )
+        pybadger.pixels.brightness = 0.1
+        pybadger.pixels.fill(color)
+
+    def handle_event(self, pybadger):
+        if pybadger.button.left:
+            print("Left button pressed")
+            self.current_index = (self.current_index - 1) % len(self.social_images)
+            self.display(pybadger)
+        elif pybadger.button.right:
+            print("Right button pressed")
+            self.current_index = (self.current_index + 1) % len(self.social_images)
+            self.display(pybadger)
+        elif any([
+                pybadger.button.b,
+                pybadger.button.start,
+                pybadger.button.select]):
+            pybadger.pixels.fill((0, 0, 0))
+            menu.change_state(BadgeStates.MENU)
+
 
 
 class Menu(State):
@@ -180,6 +256,7 @@ class BadgeStates():
         CREDITS: Credits(),
         NAME_BADGE: NameBadge(),
         WEBSITE_QR_CODE: QrCode(),
+        SOCIAL_BATTERY: SocialBattery(),
     }
 
     current_state = MAIN_SCREEN
