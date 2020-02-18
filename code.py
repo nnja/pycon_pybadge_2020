@@ -5,6 +5,7 @@ from adafruit_button import Button
 import terminalio
 import adafruit_miniqr
 
+
 class State():
 
     def display(self):
@@ -12,6 +13,26 @@ class State():
 
     def handle_event(self):
         raise NotImplementedError
+
+
+class DefaultMenuItemState(State):
+
+    def handle_event(self, pybadger):
+        buttons = pybadger.button
+        if any([
+                buttons.b,
+                buttons.start,
+                buttons.select]):
+            pybadger.pixels.fill((0, 0, 0))  # Turn off neopixels
+            menu.change_state(BadgeStates.MENU)
+        elif pybadger.button.up:
+            if hasattr(self, "led_on"):
+                self.led_on = True
+                self.display(pybadger)
+        elif pybadger.button.down:
+            if hasattr(self, "led_on"):
+                self.led_on = False
+                pybadger.pixels.fill((0, 0, 0))
 
 
 class PressStart(State):
@@ -24,31 +45,20 @@ class PressStart(State):
 
     def handle_event(self, pybadger):
         if pybadger.button.start:
-            print("Start pressed!")
             menu.change_state(BadgeStates.MENU)
         elif pybadger.button.a and pybadger.button.b:
-            print("Showing easter egg!")
             menu.change_state(BadgeStates.EASTER_EGG)
-            time.sleep(1.0)  # Prevent further button presses for 1 second.
 
 
-class Credits(State):
+class Credits(DefaultMenuItemState):
 
     def display(self, pybadger):
         pybadger.show_business_card(
             image_name="images/credits.bmp",
         )
 
-    def handle_event(self, pybadger):
-        if any([
-                pybadger.button.b,
-                pybadger.button.start,
-                pybadger.button.select]):
-            menu.change_state(BadgeStates.MENU)
 
-
-
-class NameBadge(State):
+class NameBadge(DefaultMenuItemState):
 
     colors = [
         # Python Colors
@@ -93,21 +103,10 @@ class NameBadge(State):
             print("Right button pressed")
             self.current_index = (self.current_index + 1) % len(self.colors)
             self.display(pybadger)
-        elif pybadger.button.up:
-            self.led_on = True
-            self.display(pybadger)
-        elif pybadger.button.down:
-            self.led_on = False
-            pybadger.pixels.fill((0, 0, 0))
-        elif any([
-                pybadger.button.b,
-                pybadger.button.start,
-                pybadger.button.select]):
-            pybadger.pixels.fill((0, 0, 0))
-            menu.change_state(BadgeStates.MENU)
+        super().handle_event(pybadger)
 
 
-class QrCode(State):
+class QrCode(DefaultMenuItemState):
 
     def display(self, pybadger, url = "https://aka.ms/pycon2020"):
         qr_code = adafruit_miniqr.QRCode(qr_type=2)
@@ -140,15 +139,8 @@ class QrCode(State):
         )
         pybadger.display.show(qr_and_text_group)
 
-    def handle_event(self, pybadger):
-        if any([
-                pybadger.button.b,
-                pybadger.button.start,
-                pybadger.button.select]):
-            menu.change_state(BadgeStates.MENU)
 
-
-class SocialBattery(State):
+class SocialBattery(DefaultMenuItemState):
 
     social_images = [
         ("images/social_battery/full.bmp", (0, 255, 0)),
@@ -175,12 +167,7 @@ class SocialBattery(State):
             print("Right button pressed")
             self.current_index = (self.current_index + 1) % len(self.social_images)
             self.display(pybadger)
-        elif any([
-                pybadger.button.b,
-                pybadger.button.start,
-                pybadger.button.select]):
-            pybadger.pixels.fill((0, 0, 0))
-            menu.change_state(BadgeStates.MENU)
+        super().handle_event(pybadger)
 
 
 class EasterEgg(State):
@@ -189,13 +176,9 @@ class EasterEgg(State):
         pybadger.show_business_card(
             image_name="images/easter_egg/easter_egg.bmp"
         )
-
-    def handle_event(self, pybadger):
-        if any([
-                pybadger.button.b,
-                pybadger.button.start,
-                pybadger.button.select]):
-            menu.change_state(BadgeStates.MAIN_SCREEN)
+        # Wait 4 seconds, then return to main menu.
+        time.sleep(4.0)
+        menu.change_state(BadgeStates.MAIN_SCREEN)
 
 
 class Menu(State):
@@ -234,7 +217,7 @@ class Menu(State):
         pass
 
     def handle_event(self, pybadger):
-        if pybadger.button.a or pybadger.button.b or pybadger.button.select:
+        if pybadger.button.a or pybadger.button.select:
             menu.change_state(self.menu_items[self.current_index])
         if pybadger.button.up:
             self.buttons[self.current_index].selected = False
