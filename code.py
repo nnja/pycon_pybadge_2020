@@ -26,6 +26,10 @@ class PressStart(State):
         if pybadger.button.start:
             print("Start pressed!")
             menu.change_state(BadgeStates.MENU)
+        elif pybadger.button.a and pybadger.button.b:
+            print("Showing easter egg!")
+            menu.change_state(BadgeStates.EASTER_EGG)
+            time.sleep(1.0)  # Prevent further button presses for 1 second.
 
 
 class Credits(State):
@@ -179,6 +183,20 @@ class SocialBattery(State):
             menu.change_state(BadgeStates.MENU)
 
 
+class EasterEgg(State):
+
+    def display(self, pybadger):
+        pybadger.show_business_card(
+            image_name="images/easter_egg/easter_egg.bmp"
+        )
+
+    def handle_event(self, pybadger):
+        if any([
+                pybadger.button.b,
+                pybadger.button.start,
+                pybadger.button.select]):
+            menu.change_state(BadgeStates.MAIN_SCREEN)
+
 
 class Menu(State):
 
@@ -208,7 +226,6 @@ class Menu(State):
 
 
     def display(self, pybadger):
-        # TODO NZ highlight based on currently selected menu item
         print("Display Menu Here")
         pybadger.display.show(self.group)
         pybadger.display.refresh()
@@ -257,6 +274,7 @@ class BadgeStates():
         NAME_BADGE: NameBadge(),
         WEBSITE_QR_CODE: QrCode(),
         SOCIAL_BATTERY: SocialBattery(),
+        EASTER_EGG: EasterEgg(),
     }
 
     current_state = MAIN_SCREEN
