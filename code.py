@@ -1,67 +1,95 @@
 from adafruit_pybadger import PyBadger
 import time
+import displayio
 
 
-class Action():
+class State():
 
     def display(self):
-        # TODO NZ: clear display here?
         raise NotImplementedError
 
     def handle_event(self):
         raise NotImplementedError
 
 
-class PressStart(Action):
+class PressStart(State):
 
     def display(self, pybadger):
         pybadger.show_business_card(
-            image_name="images/initial.bmp", email_string_one="press start to begin"
+            image_name="images/initial.bmp",
+            email_string_one="press start to begin"
         )
 
     def handle_event(self, pybadger):
         if pybadger.button.start:
             print("Start pressed!")
-            menu.change_state(BadgeMenu.MENU)
+            menu.change_state(BadgeStates.MENU)
 
 
-class Menu(Action):
+class Menu(State):
+
+    menu_items = [
+        "Name Badge",
+        "Learn More",
+        "Social Battery Status",
+        "Credits",
+        "Main Screen"
+    ]
+
+    def __init__(self):
+        self.current_index = 0
+        # TODO NZ max size here
+        self.group = displayio.Group()
 
     def display(self, pybadger):
+        # TODO NZ highlight based on currently selected menu item
         print("Display Menu Here")
 
     def handle_event(self, pybadger):
-        if pybadger.button.a:
-            print("Button A pressed")
+        if pybadger.button.up:
+            print("Up button pressed")
+            self.current_index = (self.current_index + 1) % len(self.menu_items)
+            print("At item", self.menu_items[self.current_index])
+        elif pybadger.button.down:
+            print("Down button pressed")
+            self.current_index = (self.current_index - 1) % len(self.menu_items)
+            print("At item", self.menu_items[self.current_index])
 
 
-class BadgeMenu():
-    START = PressStart()
-    MENU = Menu()
-    # NAME_BADGE = 2
-    # QR_CODE = 3
-    # EXPOVERT = 4
-    # THANKS = 5
-    # EASTER_EGG = 6
+class BadgeStates():
+    MAIN_SCREEN = 0
+    MENU = 1
+    NAME_BADGE = 2
+    WEBSITE_QR_CODE = 3
+    SOCIAL_BATTERY = 4
+    CREDITS = 5
+    EASTER_EGG = 6
 
-    current_state = START
+    states = {
+        MAIN_SCREEN: PressStart(),
+        MENU: Menu(),
+    }
+
+    current_state = MAIN_SCREEN
 
     def __init__(self, pybadger):
         self.pybadger = pybadger
-        self.current_state.display(self.pybadger)
+        self.states[self.current_state].display(self.pybadger)
 
     def check_event(self):
-        self.current_state.handle_event(self.pybadger)
+        self.states[self.current_state].handle_event(self.pybadger)
 
     def change_state(self, new_state):
-        print("Changing state to", new_state.__class__)
+        # TODO NZ: clear display here?
+        print("Changing state to", self.states[new_state].__class__)
         self.current_state = new_state
+        self.states[self.current_state].display(self.pybadger)
 
 
 pybadger = PyBadger()
-menu = BadgeMenu(pybadger)
+menu = BadgeStates(pybadger)
 
 
 while True:
     menu.check_event()
-    time.sleep(0.5)  # Debounce
+    time.sleep(0.2)  # Debounce
