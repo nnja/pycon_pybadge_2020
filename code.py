@@ -4,6 +4,7 @@ import displayio
 from adafruit_button import Button
 import terminalio
 
+
 class State():
 
     def display(self):
@@ -36,11 +37,39 @@ class Credits(State):
 
     def handle_event(self, pybadger):
         if any([
-            pybadger.button.b,
-            pybadger.button.start,
-            pybadger.button.select]):
+                pybadger.button.b,
+                pybadger.button.start,
+                pybadger.button.select]):
             menu.change_state(BadgeStates.MENU)
-            # time.sleep(0.1)
+
+
+class NameBadge(State):
+
+    def display(self, pybadger):
+        pybadger.show_badge(
+            name_string="Pythonista",
+            hello_scale=2,
+            my_name_is_scale=2,
+            name_scale=2)
+
+    def handle_event(self, pybadger):
+        if any([
+                pybadger.button.b,
+                pybadger.button.start,
+                pybadger.button.select]):
+            menu.change_state(BadgeStates.MENU)
+
+
+class QrCode(State):
+    def display(self, pybadger):
+        pybadger.show_qr_code(data="https://aka.ms/pycon2020")
+
+    def handle_event(self, pybadger):
+        if any([
+                pybadger.button.b,
+                pybadger.button.start,
+                pybadger.button.select]):
+            menu.change_state(BadgeStates.MENU)
 
 
 class Menu(State):
@@ -117,6 +146,8 @@ class BadgeStates():
         MAIN_SCREEN: PressStart(),
         MENU: Menu(menu_items),
         CREDITS: Credits(),
+        NAME_BADGE: NameBadge(),
+        WEBSITE_QR_CODE: QrCode(),
     }
 
     current_state = MAIN_SCREEN
