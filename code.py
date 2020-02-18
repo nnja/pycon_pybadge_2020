@@ -27,42 +27,52 @@ class PressStart(State):
             menu.change_state(BadgeStates.MENU)
 
 
+class Credits(State):
+
+    def display(self, pybadger):
+        pybadger.show_business_card(
+            image_name="images/credits.bmp",
+        )
+
+    def handle_event(self, pybadger):
+        if any([
+            pybadger.button.b,
+            pybadger.button.start,
+            pybadger.button.select]):
+            menu.change_state(BadgeStates.MENU)
+            # time.sleep(0.1)
+
+
 class Menu(State):
 
-    menu_items = [
-        "Name Badge",
-        "Learn More",
-        "Social Battery Status",
-        "Credits",
-        "Main Screen",
-    ]
-
-    def __init__(self):
+    def __init__(self, menu_items):
+        self.menu_items = menu_items
         self.current_index = 0
         self.buttons = []
+
+        self.group = displayio.Group(max_size=5)
+
+        display_height = 120
+        step = int(display_height / len(self.menu_items))
+
+        print("step is", step)
+
+        for index, menu_item in enumerate(self.menu_items):
+            button = Button(
+                x=1, y=index * step, width=159, height=step,
+                label_color=0xffff, outline_color=0x767676, fill_color=0x5c5b5c,
+                selected_fill=0x5a5a5a, selected_outline=0xffff, selected_label=0xff00ff,
+                label=menu_item, label_font=terminalio.FONT)
+            if index == self.current_index:
+                button.selected = True
+            self.group.append(button.group)
+            self.buttons.append(button)
         # TODO NZ max size here
 
 
     def display(self, pybadger):
         # TODO NZ highlight based on currently selected menu item
         print("Display Menu Here")
-        self.group = displayio.Group(max_size=5)
-
-        step = int(pybadger.display.height / len(self.menu_items))
-
-        print("step is", step)
-
-        for index, menu_item in enumerate(self.menu_items):
-            button = Button(
-                x=1, y=index * step, width=160, height=step,
-                label_color=0xff7e00, outline_color=0x767676, fill_color=0x5c5b5c,
-                selected_fill=0x5a5a5a, selected_outline=0xff6600, selected_label=0xffff,
-                label=menu_item, label_font=terminalio.FONT)
-            if index == self.current_index:
-                button.selected = True
-            self.group.append(button.group)
-            self.buttons.append(button)
-
         pybadger.display.show(self.group)
         pybadger.display.refresh()
 
@@ -71,7 +81,7 @@ class Menu(State):
 
     def handle_event(self, pybadger):
         if pybadger.button.a or pybadger.button.b or pybadger.button.select:
-            pass
+            menu.change_state(self.menu_items[self.current_index])
         if pybadger.button.up:
             self.buttons[self.current_index].selected = False
             print("Up button pressed")
@@ -87,17 +97,26 @@ class Menu(State):
 
 
 class BadgeStates():
-    MAIN_SCREEN = 0
-    MENU = 1
-    NAME_BADGE = 2
-    WEBSITE_QR_CODE = 3
-    SOCIAL_BATTERY = 4
-    CREDITS = 5
-    EASTER_EGG = 6
+    MAIN_SCREEN = "Main Screen"
+    MENU = "Menu"
+    NAME_BADGE = "Name Badge"
+    WEBSITE_QR_CODE = "Learn More"
+    SOCIAL_BATTERY = "Social Battery Status"
+    CREDITS = "Credits"
+    EASTER_EGG = "Easter Egg"
+
+    menu_items = [
+        NAME_BADGE,
+        WEBSITE_QR_CODE,
+        SOCIAL_BATTERY,
+        CREDITS,
+        MAIN_SCREEN,
+    ]
 
     states = {
         MAIN_SCREEN: PressStart(),
-        MENU: Menu(),
+        MENU: Menu(menu_items),
+        CREDITS: Credits(),
     }
 
     current_state = MAIN_SCREEN
