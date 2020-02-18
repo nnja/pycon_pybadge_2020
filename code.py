@@ -1,7 +1,8 @@
 from adafruit_pybadger import PyBadger
 import time
 import displayio
-
+from adafruit_button import Button
+import terminalio
 
 class State():
 
@@ -33,27 +34,56 @@ class Menu(State):
         "Learn More",
         "Social Battery Status",
         "Credits",
-        "Main Screen"
+        "Main Screen",
     ]
 
     def __init__(self):
         self.current_index = 0
+        self.buttons = []
         # TODO NZ max size here
-        self.group = displayio.Group()
+
 
     def display(self, pybadger):
         # TODO NZ highlight based on currently selected menu item
         print("Display Menu Here")
+        self.group = displayio.Group(max_size=5)
+
+        step = int(pybadger.display.height / len(self.menu_items))
+
+        print("step is", step)
+
+        for index, menu_item in enumerate(self.menu_items):
+            button = Button(
+                x=1, y=index * step, width=160, height=step,
+                label_color=0xff7e00, outline_color=0x767676, fill_color=0x5c5b5c,
+                selected_fill=0x5a5a5a, selected_outline=0xff6600, selected_label=0xffff,
+                label=menu_item, label_font=terminalio.FONT)
+            if index == self.current_index:
+                button.selected = True
+            self.group.append(button.group)
+            self.buttons.append(button)
+
+        pybadger.display.show(self.group)
+        pybadger.display.refresh()
+
+    def _change_highlighted_button(self):
+        pass
 
     def handle_event(self, pybadger):
+        if pybadger.button.a or pybadger.button.b or pybadger.button.select:
+            pass
         if pybadger.button.up:
+            self.buttons[self.current_index].selected = False
             print("Up button pressed")
-            self.current_index = (self.current_index + 1) % len(self.menu_items)
-            print("At item", self.menu_items[self.current_index])
-        elif pybadger.button.down:
-            print("Down button pressed")
             self.current_index = (self.current_index - 1) % len(self.menu_items)
             print("At item", self.menu_items[self.current_index])
+            self.buttons[self.current_index].selected = True
+        elif pybadger.button.down:
+            self.buttons[self.current_index].selected = False
+            print("Down button pressed")
+            self.current_index = (self.current_index + 1) % len(self.menu_items)
+            print("At item", self.menu_items[self.current_index])
+            self.buttons[self.current_index].selected = True
 
 
 class BadgeStates():
@@ -92,4 +122,4 @@ menu = BadgeStates(pybadger)
 
 while True:
     menu.check_event()
-    time.sleep(0.2)  # Debounce
+    time.sleep(0.15)  # Debounce
