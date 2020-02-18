@@ -17,6 +17,14 @@ class State():
 
 class DefaultMenuItemState(State):
 
+    def decrease_index(self, collection):
+        if hasattr(self, "current_index"):
+            self.current_index = (self.current_index - 1) % len(collection)
+
+    def increase_index(self, collection):
+        if hasattr(self, "current_index"):
+            self.current_index = (self.current_index + 1) % len(collection)
+
     def handle_event(self, pybadger):
         buttons = pybadger.button
         if any([
@@ -95,13 +103,11 @@ class NameBadge(DefaultMenuItemState):
             pybadger.pixels.fill(current_color)
 
     def handle_event(self, pybadger):
-        if pybadger.button.left:
-            print("Left button pressed")
-            self.current_index = (self.current_index - 1) % len(self.colors)
-            self.display(pybadger)
-        elif pybadger.button.right:
-            print("Right button pressed")
-            self.current_index = (self.current_index + 1) % len(self.colors)
+        if pybadger.button.left or pybadger.button.right:
+            if pybadger.button.left:
+                super().increase_index(self.colors)
+            elif pybadger.button.right:
+                super().decrease_index(self.colors)
             self.display(pybadger)
         super().handle_event(pybadger)
 
@@ -159,13 +165,11 @@ class SocialBattery(DefaultMenuItemState):
         pybadger.pixels.fill(color)
 
     def handle_event(self, pybadger):
-        if pybadger.button.left:
-            print("Left button pressed")
-            self.current_index = (self.current_index - 1) % len(self.social_images)
-            self.display(pybadger)
-        elif pybadger.button.right:
-            print("Right button pressed")
-            self.current_index = (self.current_index + 1) % len(self.social_images)
+        if pybadger.button.left or pybadger.button.right:
+            if pybadger.button.left:
+                super().decrease_index(self.social_images)
+            elif pybadger.button.right:
+                super().increase_index(self.social_images)
             self.display(pybadger)
         super().handle_event(pybadger)
 
@@ -188,7 +192,7 @@ class Menu(State):
         self.current_index = 0
         self.buttons = []
 
-        self.group = displayio.Group(max_size=5)
+        self.menu_group = displayio.Group(max_size=5)
 
         display_height = 120
         step = int(display_height / len(self.menu_items))
@@ -203,33 +207,25 @@ class Menu(State):
                 label=menu_item, label_font=terminalio.FONT)
             if index == self.current_index:
                 button.selected = True
-            self.group.append(button.group)
+            self.menu_group.append(button.group)
             self.buttons.append(button)
         # TODO NZ max size here
 
-
     def display(self, pybadger):
-        print("Display Menu Here")
-        pybadger.display.show(self.group)
+        pybadger.display.show(self.menu_group)
         pybadger.display.refresh()
-
-    def _change_highlighted_button(self):
-        pass
 
     def handle_event(self, pybadger):
         if pybadger.button.a or pybadger.button.select:
             menu.change_state(self.menu_items[self.current_index])
-        if pybadger.button.up:
+        elif pybadger.button.b:
+            menu.change_state(BadgeStates.MAIN_SCREEN)
+        elif pybadger.button.up or pybadger.button.down:
             self.buttons[self.current_index].selected = False
-            print("Up button pressed")
-            self.current_index = (self.current_index - 1) % len(self.menu_items)
-            print("At item", self.menu_items[self.current_index])
-            self.buttons[self.current_index].selected = True
-        elif pybadger.button.down:
-            self.buttons[self.current_index].selected = False
-            print("Down button pressed")
-            self.current_index = (self.current_index + 1) % len(self.menu_items)
-            print("At item", self.menu_items[self.current_index])
+            if pybadger.button.up:
+                self.current_index = (self.current_index - 1) % len(self.menu_items)
+            elif pybadger.button.down:
+                self.current_index = (self.current_index + 1) % len(self.menu_items)
             self.buttons[self.current_index].selected = True
 
 
@@ -242,7 +238,7 @@ class BadgeStates():
     CREDITS = "Credits"
     EASTER_EGG = "Easter Egg"
 
-    menu_items = [
+    sub_menu_items = [
         NAME_BADGE,
         WEBSITE_QR_CODE,
         SOCIAL_BATTERY,
@@ -252,7 +248,7 @@ class BadgeStates():
 
     states = {
         MAIN_SCREEN: PressStart(),
-        MENU: Menu(menu_items),
+        MENU: Menu(sub_menu_items),
         CREDITS: Credits(),
         NAME_BADGE: NameBadge(),
         WEBSITE_QR_CODE: QrCode(),
@@ -266,11 +262,10 @@ class BadgeStates():
         self.pybadger = pybadger
         self.states[self.current_state].display(self.pybadger)
 
-    def check_event(self):
+    def check_for_event(self):
         self.states[self.current_state].handle_event(self.pybadger)
 
     def change_state(self, new_state):
-        # TODO NZ: clear display here?
         print("Changing state to", self.states[new_state].__class__)
         self.current_state = new_state
         self.states[self.current_state].display(self.pybadger)
@@ -281,5 +276,5 @@ menu = BadgeStates(pybadger)
 
 
 while True:
-    menu.check_event()
+    menu.check_for_event()
     time.sleep(0.15)  # Debounce
