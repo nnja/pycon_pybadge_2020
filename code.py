@@ -4,6 +4,7 @@ import displayio
 from adafruit_button import Button
 import terminalio
 import adafruit_miniqr
+from adafruit_display_text import label
 
 
 class State():
@@ -155,14 +156,18 @@ class SocialBattery(DefaultMenuItemState):
     ]
 
     current_index = 0
+    led_on = True
 
     def display(self, pybadger):
         image_file, color = self.social_images[self.current_index]
         pybadger.show_business_card(
             image_name=image_file
         )
-        pybadger.pixels.brightness = 0.1
-        pybadger.pixels.fill(color)
+        if self.led_on:
+            pybadger.pixels.brightness = 0.1
+            pybadger.pixels.fill(color)
+        else:
+            pybadger.pixels.fill((0, 0, 0))
 
     def handle_event(self, pybadger):
         if pybadger.button.left or pybadger.button.right:
@@ -192,31 +197,36 @@ class Menu(State):
         self.current_index = 0
         self.buttons = []
 
-        self.menu_group = displayio.Group(max_size=5)
+        self.menu_group = displayio.Group(max_size=6)
 
         display_height = 120
-        step = int(display_height / len(self.menu_items))
+        step = int(display_height / (len(self.menu_items) + 1))
 
-        print("step is", step)
+        title = Button(
+                x=1, y=0, width=159, height=step,
+                label_color=0xffffff,
+                fill_color=0x000,
+                label="Microsoft PyBadge v1.0", label_font=terminalio.FONT)
+        self.menu_group.append(title.group)
 
-        for index, menu_item in enumerate(self.menu_items):
+        for index, menu_item in enumerate(self.menu_items, start=1):
             button = Button(
+                style=Button.ROUNDRECT,
                 x=1, y=index * step, width=159, height=step,
                 label_color=0xffff, outline_color=0x767676, fill_color=0x5c5b5c,
-                selected_fill=0x5a5a5a, selected_outline=0xffff, selected_label=0xff00ff,
+                selected_fill=0x5a5a5a, selected_outline=0xff00ff, selected_label=0xFFFF00,
                 label=menu_item, label_font=terminalio.FONT)
-            if index == self.current_index:
+            if index - 1 == self.current_index:
                 button.selected = True
             self.menu_group.append(button.group)
             self.buttons.append(button)
-        # TODO NZ max size here
 
     def display(self, pybadger):
         pybadger.display.show(self.menu_group)
         pybadger.display.refresh()
 
     def handle_event(self, pybadger):
-        if pybadger.button.a or pybadger.button.select:
+        if pybadger.button.a:
             menu.change_state(self.menu_items[self.current_index])
         elif pybadger.button.b:
             menu.change_state(BadgeStates.MAIN_SCREEN)
@@ -240,8 +250,8 @@ class BadgeStates():
 
     sub_menu_items = [
         NAME_BADGE,
-        WEBSITE_QR_CODE,
         SOCIAL_BATTERY,
+        WEBSITE_QR_CODE,
         CREDITS,
         MAIN_SCREEN,
     ]
