@@ -5,43 +5,7 @@ from adafruit_button import Button
 import terminalio
 from adafruit_display_text import label
 from util import generate_qr_code_display_group
-
-
-class State():
-
-    def display(self):
-        raise NotImplementedError
-
-    def handle_event(self):
-        raise NotImplementedError
-
-
-class DefaultMenuItemState(State):
-
-    def decrease_index(self, collection):
-        if hasattr(self, "current_index"):
-            self.current_index = (self.current_index - 1) % len(collection)
-
-    def increase_index(self, collection):
-        if hasattr(self, "current_index"):
-            self.current_index = (self.current_index + 1) % len(collection)
-
-    def handle_event(self, pybadger):
-        buttons = pybadger.button
-        if any([
-                buttons.b,
-                buttons.start,
-                buttons.select]):
-            pybadger.pixels.fill((0, 0, 0))  # Turn off neopixels
-            menu.change_state(BadgeStates.MENU)
-        elif pybadger.button.up:
-            if hasattr(self, "led_on"):
-                self.led_on = True
-                self.display(pybadger)
-        elif pybadger.button.down:
-            if hasattr(self, "led_on"):
-                self.led_on = False
-                pybadger.pixels.fill((0, 0, 0))
+from states import State, DefaultMenuItemState, BadgeStates, menu
 
 
 class PressStart(State):
@@ -212,51 +176,27 @@ class Menu(State):
             self.buttons[self.current_index].selected = True
 
 
-class BadgeStates():
-    MAIN_SCREEN = "Main Screen"
-    MENU = "Menu"
-    NAME_BADGE = "Name Badge"
-    WEBSITE_QR_CODE = "Learn More"
-    SOCIAL_BATTERY = "Social Battery Status"
-    CREDITS = "Credits"
-    EASTER_EGG = "Easter Egg"
+sub_menu_items = [
+    BadgeStates.NAME_BADGE,
+    BadgeStates.SOCIAL_BATTERY,
+    BadgeStates.WEBSITE_QR_CODE,
+    BadgeStates.CREDITS,
+    BadgeStates.MAIN_SCREEN,
+]
 
-    sub_menu_items = [
-        NAME_BADGE,
-        SOCIAL_BATTERY,
-        WEBSITE_QR_CODE,
-        CREDITS,
-        MAIN_SCREEN,
-    ]
-
-    states = {
-        MAIN_SCREEN: PressStart(),
-        MENU: Menu(sub_menu_items),
-        CREDITS: Credits(),
-        NAME_BADGE: NameBadge(),
-        WEBSITE_QR_CODE: QrCode(),
-        SOCIAL_BATTERY: SocialBattery(),
-        EASTER_EGG: EasterEgg(),
-    }
-
-    current_state = MAIN_SCREEN
-
-    def __init__(self, pybadger):
-        self.pybadger = pybadger
-        self.states[self.current_state].display(self.pybadger)
-
-    def check_for_event(self):
-        self.states[self.current_state].handle_event(self.pybadger)
-
-    def change_state(self, new_state):
-        print("Changing state to", self.states[new_state].__class__)
-        self.current_state = new_state
-        self.states[self.current_state].display(self.pybadger)
-
+states = {
+    BadgeStates.MAIN_SCREEN: PressStart(),
+    BadgeStates.MENU: Menu(sub_menu_items),
+    BadgeStates.CREDITS: Credits(),
+    BadgeStates.NAME_BADGE: NameBadge(),
+    BadgeStates.WEBSITE_QR_CODE: QrCode(),
+    BadgeStates.SOCIAL_BATTERY: SocialBattery(),
+    BadgeStates.EASTER_EGG: EasterEgg(),
+}
 
 pybadger = PyBadger()
-menu = BadgeStates(pybadger)
-
+menu.set_initial_states(states)
+menu.set_pybadger(pybadger)
 
 while True:
     menu.check_for_event()
