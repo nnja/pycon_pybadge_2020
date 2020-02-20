@@ -4,7 +4,7 @@ import displayio
 from adafruit_button import Button
 import terminalio
 from adafruit_display_text import label
-from util import generate_qr_code_display_group
+from util import generate_qr_code_display_group, ALL_COLORS
 from states import State, DefaultMenuItemState, BadgeStates
 
 
@@ -38,25 +38,11 @@ class Credits(DefaultMenuItemState):
 
 class NameBadge(DefaultMenuItemState):
 
-    colors = [
-        # Python Colors
-        0x4B8BBE,   # Python Blue
-        0xFFD43B,   # Python Yellow
-        # Vaporwave Colors
-        0x0ff,      # Cyan
-        0xff00ff,   # Pink
-        # Rainbow Colors
-        0xff0000,   # Red
-        0xFF7F00,   # Orange
-        0xFFFF00,   # Yellow
-        0x00FF00,   # Green
-        0x0000FF,   # Blue
-        0x2E2B5F,   # Indigo,
-        0x8B00FF,   # Violet,
-    ]
-
     current_index = 0
     led_on = False
+
+    def __init__(self, colors=ALL_COLORS):
+        self.colors = colors
 
     def display(self, pybadger):
         current_color = self.colors[self.current_index]
