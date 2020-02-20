@@ -129,8 +129,15 @@ class EasterEgg(State):
 
 class Menu(State):
 
-    def __init__(self, menu_items):
-        self.menu_items = menu_items
+    menu_items = [
+        BadgeStates.NAME_BADGE,
+        BadgeStates.SOCIAL_BATTERY,
+        BadgeStates.WEBSITE_QR_CODE,
+        BadgeStates.CREDITS,
+        BadgeStates.MAIN_SCREEN,
+    ]
+
+    def __init__(self):
         self.current_index = 0
         self.buttons = []
 
@@ -176,17 +183,9 @@ class Menu(State):
             self.buttons[self.current_index].selected = True
 
 
-sub_menu_items = [
-    BadgeStates.NAME_BADGE,
-    BadgeStates.SOCIAL_BATTERY,
-    BadgeStates.WEBSITE_QR_CODE,
-    BadgeStates.CREDITS,
-    BadgeStates.MAIN_SCREEN,
-]
-
 states = {
     BadgeStates.MAIN_SCREEN: PressStart(),
-    BadgeStates.MENU: Menu(sub_menu_items),
+    BadgeStates.MENU: Menu(),
     BadgeStates.CREDITS: Credits(),
     BadgeStates.NAME_BADGE: NameBadge(),
     BadgeStates.WEBSITE_QR_CODE: QrCode(),
