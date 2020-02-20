@@ -17,14 +17,18 @@ class DefaultMenuItemState(State):
         if hasattr(self, "current_index"):
             self.current_index = (self.current_index + 1) % len(collection)
 
-    def handle_event(self, pybadger):
-        buttons = pybadger.button
-        if any([
+    def should_return_to_menu(self, buttons):
+        return any(
+            [
                 buttons.b,
                 buttons.start,
-                buttons.select]):
+                buttons.select
+            ])
+
+    def handle_event(self, pybadger):
+        buttons = pybadger.button
+        if self.should_return_to_menu(buttons):
             pybadger.pixels.fill((0, 0, 0))  # Turn off neopixels
-            menu.change_state(BadgeStates.MENU)
         elif pybadger.button.up:
             if hasattr(self, "led_on"):
                 self.led_on = True
@@ -46,15 +50,13 @@ class BadgeStates():
 
     current_state = MAIN_SCREEN
 
+    def __init__(self, pybadger, states):
+        self.pybadger = pybadger
+        self.states = states
+        self.states[self.current_state].display(self.pybadger)
+
     def set_initial_states(self, states):
         self.states = states
-
-    def set_pybadger(self, pybadger):
-        self.pybadger = pybadger
-        if self.states:
-            self.states[self.current_state].display(self.pybadger)
-        else:
-            print("Please set states first.")
 
     def check_for_event(self):
         self.states[self.current_state].handle_event(self.pybadger)
@@ -63,6 +65,3 @@ class BadgeStates():
         print("Changing state to", self.states[new_state].__class__)
         self.current_state = new_state
         self.states[self.current_state].display(self.pybadger)
-
-
-menu = BadgeStates()

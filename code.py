@@ -5,7 +5,7 @@ from adafruit_button import Button
 import terminalio
 from adafruit_display_text import label
 from util import generate_qr_code_display_group
-from states import State, DefaultMenuItemState, BadgeStates, menu
+from states import State, DefaultMenuItemState, BadgeStates
 
 
 class PressStart(State):
@@ -29,6 +29,11 @@ class Credits(DefaultMenuItemState):
         pybadger.show_business_card(
             image_name="images/credits.bmp",
         )
+
+    def handle_event(self, pybadger):
+        if self.should_return_to_menu(pybadger.button):
+            menu.change_state(BadgeStates.MENU)
+        super().handle_event(pybadger)
 
 
 class NameBadge(DefaultMenuItemState):
@@ -68,7 +73,9 @@ class NameBadge(DefaultMenuItemState):
             pybadger.pixels.fill(current_color)
 
     def handle_event(self, pybadger):
-        if pybadger.button.left or pybadger.button.right:
+        if self.should_return_to_menu(pybadger.button):
+            menu.change_state(BadgeStates.MENU)
+        elif pybadger.button.left or pybadger.button.right:
             if pybadger.button.left:
                 super().increase_index(self.colors)
             elif pybadger.button.right:
@@ -82,6 +89,11 @@ class QrCode(DefaultMenuItemState):
     def display(self, pybadger, url="https://aka.ms/pycon2020"):
         qr_group = generate_qr_code_display_group(pybadger, url)
         pybadger.display.show(qr_group)
+
+    def handle_event(self, pybadger):
+        if self.should_return_to_menu(pybadger.button):
+            menu.change_state(BadgeStates.MENU)
+        super().handle_event(pybadger)
 
 
 class SocialBattery(DefaultMenuItemState):
@@ -107,7 +119,9 @@ class SocialBattery(DefaultMenuItemState):
             pybadger.pixels.fill((0, 0, 0))
 
     def handle_event(self, pybadger):
-        if pybadger.button.left or pybadger.button.right:
+        if self.should_return_to_menu(pybadger.button):
+            menu.change_state(BadgeStates.MENU)
+        elif pybadger.button.left or pybadger.button.right:
             if pybadger.button.left:
                 super().decrease_index(self.social_images)
             elif pybadger.button.right:
@@ -194,8 +208,7 @@ states = {
 }
 
 pybadger = PyBadger()
-menu.set_initial_states(states)
-menu.set_pybadger(pybadger)
+menu = BadgeStates(pybadger, states)
 
 while True:
     menu.check_for_event()
