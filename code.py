@@ -12,6 +12,9 @@ from util import ALL_COLORS, generate_qr_code_display_group
 
 
 class PressStart(State):
+
+    label = "Main Screen"
+
     def display(self):
         pybadger.show_business_card(
             image_name="images/initial.bmp", email_string_one="press start to begin"
@@ -19,22 +22,27 @@ class PressStart(State):
 
     def handle_event(self):
         if pybadger.button.start:
-            menu.change_state(BadgeStates.MENU)
+            menu.change_state(Menu)
         elif pybadger.button.a and pybadger.button.b:
-            menu.change_state(BadgeStates.EASTER_EGG)
+            menu.change_state(EasterEgg)
 
 
 class Credits(DefaultMenuItemState):
+
+    label = "Credits"
+
     def display(self):
         pybadger.show_business_card(image_name="images/credits.bmp",)
 
     def handle_event(self):
         if self.should_return_to_menu(pybadger.button):
-            menu.change_state(BadgeStates.MENU)
+            menu.change_state(Menu)
         super().handle_event()
 
 
 class NameBadge(DefaultMenuItemState):
+
+    label = "Name Badge"
 
     current_index = 0
     led_on = False
@@ -58,7 +66,7 @@ class NameBadge(DefaultMenuItemState):
 
     def handle_event(self):
         if self.should_return_to_menu(pybadger.button):
-            menu.change_state(BadgeStates.MENU)
+            menu.change_state(Menu)
         elif pybadger.button.left or pybadger.button.right:
             if pybadger.button.left:
                 super().increase_index(self.colors)
@@ -69,17 +77,22 @@ class NameBadge(DefaultMenuItemState):
 
 
 class QrCode(DefaultMenuItemState):
+
+    label = "Learn More"
+
     def display(self, url="https://aka.ms/pycon2020"):
         qr_group = generate_qr_code_display_group(url)
         pybadger.display.show(qr_group)
 
     def handle_event(self):
         if self.should_return_to_menu(pybadger.button):
-            menu.change_state(BadgeStates.MENU)
+            menu.change_state(Menu)
         super().handle_event()
 
 
 class SocialBattery(DefaultMenuItemState):
+
+    label = "Social Battery Status"
 
     social_images = [
         ("images/social_battery/full.bmp", (0, 255, 0)),
@@ -101,7 +114,7 @@ class SocialBattery(DefaultMenuItemState):
 
     def handle_event(self):
         if self.should_return_to_menu(pybadger.button):
-            menu.change_state(BadgeStates.MENU)
+            menu.change_state(Menu)
         elif pybadger.button.left or pybadger.button.right:
             if pybadger.button.left:
                 super().decrease_index(self.social_images)
@@ -112,21 +125,26 @@ class SocialBattery(DefaultMenuItemState):
 
 
 class EasterEgg(State):
+
+    label = "Easter Egg"
+
     def display(self):
         pybadger.show_business_card(image_name="images/easter_egg/easter_egg.bmp")
         # Wait 4 seconds, then return to main menu.
         time.sleep(4.0)
-        menu.change_state(BadgeStates.MAIN_SCREEN)
+        menu.change_state(PressStart)
 
 
 class Menu(State):
 
+    label = "Menu"
+
     menu_items = [
-        BadgeStates.NAME_BADGE,
-        BadgeStates.SOCIAL_BATTERY,
-        BadgeStates.WEBSITE_QR_CODE,
-        BadgeStates.CREDITS,
-        BadgeStates.MAIN_SCREEN,
+        NameBadge,
+        SocialBattery,
+        QrCode,
+        Credits,
+        PressStart,
     ]
 
     def __init__(self):
@@ -163,7 +181,7 @@ class Menu(State):
                 selected_fill=0x5A5A5A,
                 selected_outline=0xFF00FF,
                 selected_label=0xFFFF00,
-                label=menu_item,
+                label=menu_item.label,
                 label_font=terminalio.FONT,
             )
             if index - 1 == self.current_index:
@@ -179,7 +197,7 @@ class Menu(State):
         if pybadger.button.a:
             menu.change_state(self.menu_items[self.current_index])
         elif pybadger.button.b:
-            menu.change_state(BadgeStates.MAIN_SCREEN)
+            menu.change_state(PressStart)
         elif pybadger.button.up or pybadger.button.down:
             self.buttons[self.current_index].selected = False
             if pybadger.button.up:
@@ -189,17 +207,17 @@ class Menu(State):
             self.buttons[self.current_index].selected = True
 
 
-states = {
-    BadgeStates.MAIN_SCREEN: PressStart(),
-    BadgeStates.MENU: Menu(),
-    BadgeStates.CREDITS: Credits(),
-    BadgeStates.NAME_BADGE: NameBadge(),
-    BadgeStates.WEBSITE_QR_CODE: QrCode(),
-    BadgeStates.SOCIAL_BATTERY: SocialBattery(),
-    BadgeStates.EASTER_EGG: EasterEgg(),
-}
-
-menu = BadgeStates(states)
+menu = BadgeStates()
+menu.add(
+   PressStart(),
+   Menu(),
+   Credits(),
+   NameBadge(),
+   QrCode(),
+   SocialBattery(),
+   EasterEgg(),
+)
+menu.change_state(PressStart)
 
 while True:
     menu.check_for_event()

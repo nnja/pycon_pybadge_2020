@@ -2,6 +2,9 @@ from adafruit_pybadger import pybadger
 
 
 class State:
+
+    label = "State"
+
     def display(self):
         raise NotImplementedError
 
@@ -36,22 +39,13 @@ class DefaultMenuItemState(State):
 
 
 class BadgeStates:
-    MAIN_SCREEN = "Main Screen"
-    MENU = "Menu"
-    NAME_BADGE = "Name Badge"
-    WEBSITE_QR_CODE = "Learn More"
-    SOCIAL_BATTERY = "Social Battery Status"
-    CREDITS = "Credits"
-    EASTER_EGG = "Easter Egg"
+    current_state = None
 
-    current_state = MAIN_SCREEN
+    def __init__(self):
+        self.states = {}
 
-    def __init__(self, states):
-        self.states = states
-        self.states[self.current_state].display()
-
-    def set_initial_states(self, states):
-        self.states = states
+    def add(self, *states):
+        self.states.update({state.__class__: state for state in states})
 
     def check_for_event(self):
         self.states[self.current_state].handle_event()
