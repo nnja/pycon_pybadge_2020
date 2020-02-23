@@ -2,7 +2,8 @@ import time
 
 import displayio
 from adafruit_pybadger import pybadger
-from states import BadgeStates, DefaultMenuItemState, MainMenu, State
+
+from states import StateManager, DefaultMenuItemState, MainMenu, State
 from util import ALL_COLORS, generate_qr_code_display_group, set_splash_screen
 
 
@@ -98,7 +99,7 @@ class EasterEgg(State):
 
 main_menu = MainMenu(NameBadge, SocialBattery, QrCode, Credits, PressStart)
 
-state_manager = BadgeStates()
+state_manager = StateManager()
 state_manager.add(
     main_menu,
     PressStart(),

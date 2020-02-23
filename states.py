@@ -1,5 +1,6 @@
 import displayio
 import terminalio
+
 from adafruit_button import Button
 from adafruit_pybadger import pybadger
 
@@ -115,7 +116,7 @@ class MainMenu(State):
             self.buttons[self.current_index].selected = True
 
 
-class BadgeStates:
+class StateManager:
     current_state = None
 
     def __init__(self):
