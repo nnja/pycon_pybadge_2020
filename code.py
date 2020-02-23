@@ -12,11 +12,9 @@ from util import ALL_COLORS, generate_qr_code_display_group
 
 
 class PressStart(State):
-
     def display(self):
         pybadger.show_business_card(
-            image_name="images/initial.bmp",
-            email_string_one="press start to begin"
+            image_name="images/initial.bmp", email_string_one="press start to begin"
         )
 
     def handle_event(self):
@@ -27,11 +25,8 @@ class PressStart(State):
 
 
 class Credits(DefaultMenuItemState):
-
     def display(self):
-        pybadger.show_business_card(
-            image_name="images/credits.bmp",
-        )
+        pybadger.show_business_card(image_name="images/credits.bmp",)
 
     def handle_event(self):
         if self.should_return_to_menu(pybadger.button):
@@ -54,7 +49,7 @@ class NameBadge(DefaultMenuItemState):
             name_string="Pythonista",
             hello_scale=2,
             my_name_is_scale=2,
-            name_scale=2
+            name_scale=2,
         )
 
         if self.led_on:
@@ -74,7 +69,6 @@ class NameBadge(DefaultMenuItemState):
 
 
 class QrCode(DefaultMenuItemState):
-
     def display(self, url="https://aka.ms/pycon2020"):
         qr_group = generate_qr_code_display_group(url)
         pybadger.display.show(qr_group)
@@ -98,9 +92,7 @@ class SocialBattery(DefaultMenuItemState):
 
     def display(self):
         image_file, color = self.social_images[self.current_index]
-        pybadger.show_business_card(
-            image_name=image_file
-        )
+        pybadger.show_business_card(image_name=image_file)
         if self.led_on:
             pybadger.pixels.brightness = 0.1
             pybadger.pixels.fill(color)
@@ -120,11 +112,8 @@ class SocialBattery(DefaultMenuItemState):
 
 
 class EasterEgg(State):
-
     def display(self):
-        pybadger.show_business_card(
-            image_name="images/easter_egg/easter_egg.bmp"
-        )
+        pybadger.show_business_card(image_name="images/easter_egg/easter_egg.bmp")
         # Wait 4 seconds, then return to main menu.
         time.sleep(4.0)
         menu.change_state(BadgeStates.MAIN_SCREEN)
@@ -150,19 +139,33 @@ class Menu(State):
         step = int(display_height / (len(self.menu_items) + 1))
 
         title = Button(
-                x=1, y=0, width=159, height=step,
-                label_color=0xffffff,
-                fill_color=0x000,
-                label="Microsoft PyBadge v1.0", label_font=terminalio.FONT)
+            x=1,
+            y=0,
+            width=159,
+            height=step,
+            label_color=0xFFFFFF,
+            fill_color=0x000,
+            label="Microsoft PyBadge v1.0",
+            label_font=terminalio.FONT,
+        )
         self.menu_group.append(title.group)
 
         for index, menu_item in enumerate(self.menu_items, start=1):
             button = Button(
                 style=Button.ROUNDRECT,
-                x=1, y=index * step, width=159, height=step,
-                label_color=0xffff, outline_color=0x767676, fill_color=0x5c5b5c,
-                selected_fill=0x5a5a5a, selected_outline=0xff00ff, selected_label=0xFFFF00,
-                label=menu_item, label_font=terminalio.FONT)
+                x=1,
+                y=index * step,
+                width=159,
+                height=step,
+                label_color=0xFFFF,
+                outline_color=0x767676,
+                fill_color=0x5C5B5C,
+                selected_fill=0x5A5A5A,
+                selected_outline=0xFF00FF,
+                selected_label=0xFFFF00,
+                label=menu_item,
+                label_font=terminalio.FONT,
+            )
             if index - 1 == self.current_index:
                 button.selected = True
             self.menu_group.append(button.group)

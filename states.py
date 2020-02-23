@@ -1,7 +1,7 @@
 from adafruit_pybadger import pybadger
 
-class State():
 
+class State:
     def display(self):
         raise NotImplementedError
 
@@ -10,7 +10,6 @@ class State():
 
 
 class DefaultMenuItemState(State):
-
     def decrease_index(self, collection):
         if hasattr(self, "current_index"):
             self.current_index = (self.current_index - 1) % len(collection)
@@ -20,12 +19,7 @@ class DefaultMenuItemState(State):
             self.current_index = (self.current_index + 1) % len(collection)
 
     def should_return_to_menu(self, buttons):
-        return any(
-            [
-                buttons.b,
-                buttons.start,
-                buttons.select
-            ])
+        return any([buttons.b, buttons.start, buttons.select])
 
     def handle_event(self):
         buttons = pybadger.button
@@ -41,7 +35,7 @@ class DefaultMenuItemState(State):
                 pybadger.pixels.fill((0, 0, 0))
 
 
-class BadgeStates():
+class BadgeStates:
     MAIN_SCREEN = "Main Screen"
     MENU = "Menu"
     NAME_BADGE = "Name Badge"
