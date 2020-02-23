@@ -78,12 +78,10 @@ class SocialBattery(DefaultMenuItemState):
         image_file, color = self.social_images[
             self.current_index % len(self.social_images)
         ]
-        pybadger.show_business_card(image_name=image_file)
+        set_splash_screen(image=image_file)
         if self.led_on:
             pybadger.pixels.brightness = 0.1
             pybadger.pixels.fill(color)
-        else:
-            pybadger.pixels.fill((0, 0, 0))
 
 
 class EasterEgg(State):

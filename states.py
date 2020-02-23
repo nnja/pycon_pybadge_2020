@@ -36,13 +36,11 @@ class DefaultMenuItemState(State):
             pybadger.pixels.fill((0, 0, 0))  # Turn off neopixels
             self.state_manager.previous_state()
         elif pybadger.button.up:
-            if hasattr(self, "led_on"):
-                self.led_on = True
-                self.display()
+            self.led_on = True
+            self.display()
         elif pybadger.button.down:
-            if hasattr(self, "led_on"):
-                self.led_on = False
-                pybadger.pixels.fill((0, 0, 0))
+            self.led_on = False
+            pybadger.pixels.fill((0, 0, 0))
         elif pybadger.button.left or pybadger.button.right:
             if pybadger.button.left:
                 self.current_index -= 1
