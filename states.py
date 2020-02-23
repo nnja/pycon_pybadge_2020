@@ -1,3 +1,6 @@
+import displayio
+import terminalio
+from adafruit_button import Button
 from adafruit_pybadger import pybadger
 
 
@@ -45,6 +48,71 @@ class DefaultMenuItemState(State):
             elif pybadger.button.right:
                 self.current_index += 1
             self.display()
+
+
+class MainMenu(State):
+
+    label = "Menu"
+
+    def __init__(self, *menu_items):
+        self.menu_items = menu_items
+        self.current_index = 0
+        self.buttons = []
+
+        self.menu_group = displayio.Group(max_size=6)
+
+        display_height = 120
+        step = int(display_height / (len(self.menu_items) + 1))
+
+        title = Button(
+            x=1,
+            y=0,
+            width=159,
+            height=step,
+            label_color=0xFFFFFF,
+            fill_color=0x000,
+            label="Microsoft PyBadge v1.0",
+            label_font=terminalio.FONT,
+        )
+        self.menu_group.append(title.group)
+
+        for index, menu_item in enumerate(self.menu_items, start=1):
+            button = Button(
+                style=Button.ROUNDRECT,
+                x=1,
+                y=index * step,
+                width=159,
+                height=step,
+                label_color=0xFFFF,
+                outline_color=0x767676,
+                fill_color=0x5C5B5C,
+                selected_fill=0x5A5A5A,
+                selected_outline=0xFF00FF,
+                selected_label=0xFFFF00,
+                label=menu_item.label,
+                label_font=terminalio.FONT,
+            )
+            if index - 1 == self.current_index:
+                button.selected = True
+            self.menu_group.append(button.group)
+            self.buttons.append(button)
+
+    def display(self):
+        pybadger.display.show(self.menu_group)
+        pybadger.display.refresh()
+
+    def handle_event(self):
+        if pybadger.button.a:
+            self.state_manager.state = self.menu_items[self.current_index]
+        elif pybadger.button.b:
+            self.state_manager.previous_state()
+        elif pybadger.button.up or pybadger.button.down:
+            self.buttons[self.current_index].selected = False
+            if pybadger.button.up:
+                self.current_index = (self.current_index - 1) % len(self.menu_items)
+            elif pybadger.button.down:
+                self.current_index = (self.current_index + 1) % len(self.menu_items)
+            self.buttons[self.current_index].selected = True
 
 
 class BadgeStates:
