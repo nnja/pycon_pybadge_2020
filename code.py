@@ -22,9 +22,9 @@ class PressStart(State):
 
     def handle_event(self):
         if pybadger.button.start:
-            menu.change_state(Menu)
+            menu.state = Menu
         elif pybadger.button.a and pybadger.button.b:
-            menu.change_state(EasterEgg)
+            menu.state = EasterEgg
 
 
 class Credits(DefaultMenuItemState):
@@ -36,7 +36,7 @@ class Credits(DefaultMenuItemState):
 
     def handle_event(self):
         if self.should_return_to_menu(pybadger.button):
-            menu.change_state(Menu)
+            menu.state = Menu
         super().handle_event()
 
 
@@ -66,7 +66,7 @@ class NameBadge(DefaultMenuItemState):
 
     def handle_event(self):
         if self.should_return_to_menu(pybadger.button):
-            menu.change_state(Menu)
+            menu.state = Menu
         elif pybadger.button.left or pybadger.button.right:
             if pybadger.button.left:
                 super().increase_index(self.colors)
@@ -86,7 +86,7 @@ class QrCode(DefaultMenuItemState):
 
     def handle_event(self):
         if self.should_return_to_menu(pybadger.button):
-            menu.change_state(Menu)
+            menu.state = Menu
         super().handle_event()
 
 
@@ -114,7 +114,7 @@ class SocialBattery(DefaultMenuItemState):
 
     def handle_event(self):
         if self.should_return_to_menu(pybadger.button):
-            menu.change_state(Menu)
+            menu.state = Menu
         elif pybadger.button.left or pybadger.button.right:
             if pybadger.button.left:
                 super().decrease_index(self.social_images)
@@ -132,7 +132,7 @@ class EasterEgg(State):
         pybadger.show_business_card(image_name="images/easter_egg/easter_egg.bmp")
         # Wait 4 seconds, then return to main menu.
         time.sleep(4.0)
-        menu.change_state(PressStart)
+        menu.state = PressStart
 
 
 class Menu(State):
@@ -195,9 +195,9 @@ class Menu(State):
 
     def handle_event(self):
         if pybadger.button.a:
-            menu.change_state(self.menu_items[self.current_index])
+            menu.state = self.menu_items[self.current_index]
         elif pybadger.button.b:
-            menu.change_state(PressStart)
+            menu.state = PressStart
         elif pybadger.button.up or pybadger.button.down:
             self.buttons[self.current_index].selected = False
             if pybadger.button.up:
@@ -217,7 +217,7 @@ menu.add(
    SocialBattery(),
    EasterEgg(),
 )
-menu.change_state(PressStart)
+menu.state = PressStart
 
 while True:
     menu.check_for_event()

@@ -50,7 +50,12 @@ class BadgeStates:
     def check_for_event(self):
         self.states[self.current_state].handle_event()
 
-    def change_state(self, new_state):
-        print("Changing state to", self.states[new_state].__class__)
-        self.current_state = new_state
+    @property
+    def state(self):
+        return self.states[self.current_state]
+
+    @state.setter
+    def state(self, state):
+        print("Changing state to", self.states[state].__class__)
+        self.current_state = state
         self.states[self.current_state].display()
