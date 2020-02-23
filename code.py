@@ -7,6 +7,13 @@ from states import StateManager, DefaultMenuItemState, MainMenu, State
 from util import ALL_COLORS, generate_qr_code_display_group, set_splash_screen
 
 
+# These are constants, try changing them and saving the file!
+NAME = "Pythonista"
+NAME_BADGE_COLORS = ALL_COLORS
+LED_BRIGHTNESS = 0.1
+URL = "https://aka.ms/pycon2020"
+
+
 class PressStart(State):
 
     label = "Main Screen"
@@ -34,13 +41,11 @@ class NameBadge(DefaultMenuItemState):
     label = "Name Badge"
 
     led_on = True
-    colors = ALL_COLORS
-    name = "Pythonista"
 
     def display(self):
-        current_color = self.colors[self.current_index % len(self.colors)]
+        current_color = NAME_BADGE_COLORS[self.current_index % len(NAME_BADGE_COLORS)]
         pybadger.show_badge(
-            name_string=self.name,
+            name_string=NAME,
             background_color=current_color,
             hello_scale=2,
             my_name_is_scale=2,
@@ -56,9 +61,12 @@ class QrCode(DefaultMenuItemState):
 
     label = "Learn More"
 
-    def display(self, url="https://aka.ms/pycon2020"):
-        qr_group = generate_qr_code_display_group(url)
-        pybadger.display.show(qr_group)
+    def __init__(self):
+        self.qr_group = generate_qr_code_display_group(URL)
+        super().__init__()
+
+    def display(self):
+        pybadger.display.show(self.qr_group)
 
 
 class SocialBattery(DefaultMenuItemState):
