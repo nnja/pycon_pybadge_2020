@@ -2,8 +2,10 @@ import adafruit_miniqr
 import displayio
 import terminalio
 
+from adafruit_pybadger import pybadger
 
-def generate_qr_code_display_group(pybadger, url):
+
+def generate_qr_code_display_group(url):
     """Generate and display a QR code for the given URL"""
     qr_code = adafruit_miniqr.QRCode(qr_type=2)
     qr_code.add_data(bytearray(url))

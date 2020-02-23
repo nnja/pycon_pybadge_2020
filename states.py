@@ -1,3 +1,5 @@
+from adafruit_pybadger import pybadger
+
 class State():
 
     def display(self):
@@ -25,14 +27,14 @@ class DefaultMenuItemState(State):
                 buttons.select
             ])
 
-    def handle_event(self, pybadger):
+    def handle_event(self):
         buttons = pybadger.button
         if self.should_return_to_menu(buttons):
             pybadger.pixels.fill((0, 0, 0))  # Turn off neopixels
         elif pybadger.button.up:
             if hasattr(self, "led_on"):
                 self.led_on = True
-                self.display(pybadger)
+                self.display()
         elif pybadger.button.down:
             if hasattr(self, "led_on"):
                 self.led_on = False
@@ -50,18 +52,17 @@ class BadgeStates():
 
     current_state = MAIN_SCREEN
 
-    def __init__(self, pybadger, states):
-        self.pybadger = pybadger
+    def __init__(self, states):
         self.states = states
-        self.states[self.current_state].display(self.pybadger)
+        self.states[self.current_state].display()
 
     def set_initial_states(self, states):
         self.states = states
 
     def check_for_event(self):
-        self.states[self.current_state].handle_event(self.pybadger)
+        self.states[self.current_state].handle_event()
 
     def change_state(self, new_state):
         print("Changing state to", self.states[new_state].__class__)
         self.current_state = new_state
-        self.states[self.current_state].display(self.pybadger)
+        self.states[self.current_state].display()
