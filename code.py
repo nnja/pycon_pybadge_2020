@@ -1,11 +1,14 @@
-from adafruit_pybadger import PyBadger
 import time
+
 import displayio
-from adafruit_button import Button
 import terminalio
+
+from adafruit_button import Button
 from adafruit_display_text import label
-from util import generate_qr_code_display_group, ALL_COLORS
-from states import State, DefaultMenuItemState, BadgeStates
+from adafruit_pybadger import pybadger
+
+from states import BadgeStates, DefaultMenuItemState, State
+from util import ALL_COLORS, generate_qr_code_display_group
 
 
 class PressStart(State):
@@ -193,7 +196,6 @@ states = {
     BadgeStates.EASTER_EGG: EasterEgg(),
 }
 
-pybadger = PyBadger()
 menu = BadgeStates(pybadger, states)
 
 while True:

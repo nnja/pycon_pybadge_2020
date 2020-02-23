@@ -1,6 +1,6 @@
 import adafruit_miniqr
-import terminalio
 import displayio
+import terminalio
 
 
 def generate_qr_code_display_group(pybadger, url):
