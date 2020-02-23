@@ -5,6 +5,11 @@ import terminalio
 from adafruit_pybadger import pybadger
 
 
+def set_splash_screen(image, text=None, text_two=None):
+    pybadger.show_business_card(
+        image_name=image, email_string_one=text, email_string_two=text_two)
+
+
 def generate_qr_code_display_group(url):
     """Generate and display a QR code for the given URL"""
     qr_code = adafruit_miniqr.QRCode(qr_type=2)
