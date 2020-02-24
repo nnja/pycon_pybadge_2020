@@ -4,7 +4,7 @@ import displayio
 from adafruit_pybadger import pybadger
 
 from states import StateManager, DefaultMenuItemState, MainMenu, State
-from util import ALL_COLORS, generate_qr_code_display_group, set_splash_screen
+from util import ALL_COLORS, generate_qr_code_display_group, display_bg_and_text
 from collections import namedtuple
 
 
@@ -21,7 +21,7 @@ class PressStart(State):
     label = "Main Screen"
 
     def display(self):
-        set_splash_screen(image="images/initial.bmp", text="press start to begin")
+        display_bg_and_text(image="images/initial.bmp", text="press start to begin")
 
     def handle_event(self):
         if pybadger.button.start:
@@ -35,7 +35,7 @@ class Credits(DefaultMenuItemState):
     label = "Credits"
 
     def display(self):
-        set_splash_screen(image="images/credits.bmp")
+        display_bg_and_text(image="images/credits.bmp")
 
 
 class NameBadge(DefaultMenuItemState):
@@ -86,7 +86,7 @@ class SocialBattery(DefaultMenuItemState):
 
     def display(self):
         social_state = self.states[self.current_index % len(self.states)]
-        set_splash_screen(image=social_state.image)
+        display_bg_and_text(image=social_state.image)
         self.led_color = social_state.color
 
 
@@ -95,7 +95,7 @@ class EasterEgg(State):
     label = "Easter Egg"
 
     def display(self):
-        set_splash_screen(image="images/easter_egg/easter_egg.bmp")
+        display_bg_and_text(image="images/easter_egg/easter_egg.bmp")
         time.sleep(4.0)  # Wait 4 seconds, then return to main state_manager.
         state_manager.previous_state()
 

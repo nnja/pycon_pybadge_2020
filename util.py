@@ -5,7 +5,7 @@ import terminalio
 from adafruit_pybadger import pybadger
 
 
-def set_splash_screen(image, text=None, text_two=None):
+def display_bg_and_text(image, text=None, text_two=None):
     pybadger.show_business_card(
         image_name=image, email_string_one=text, email_string_two=text_two
     )
