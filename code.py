@@ -21,14 +21,12 @@
 # SOFTWARE.
 
 import time
-
-import displayio
-from adafruit_pybadger import pybadger
-
-from states import StateManager, DefaultMenuItemState, MainMenu, State
-from util import ALL_COLORS, generate_qr_code_display_group, display_bg_and_text
 from collections import namedtuple
 
+from adafruit_pybadger import pybadger
+
+from states import DefaultMenuItemState, MainMenu, State, StateManager
+from util import ALL_COLORS, display_bg_and_text, generate_qr_code_display_group
 
 # These are constants, try changing them and saving the file!
 NAME = "Pythonista"
