@@ -22,10 +22,21 @@ class State:
 class DefaultMenuItemState(State):
 
     led_on = False
+    _led_color = None
 
     def __init__(self):
         self.current_index = 0
         super().__init__()
+
+    @property
+    def led_color(self):
+        return self._led_color
+
+    @led_color.setter
+    def led_color(self, led_color):
+        self._led_color = led_color
+        if self.led_on and self._led_color:
+            pybadger.pixels.fill(self._led_color)
 
     def should_return_to_menu(self, buttons):
         return any([buttons.b, buttons.start, buttons.select])

@@ -5,13 +5,15 @@ from adafruit_pybadger import pybadger
 
 from states import StateManager, DefaultMenuItemState, MainMenu, State
 from util import ALL_COLORS, generate_qr_code_display_group, set_splash_screen
+from collections import namedtuple
 
 
 # These are constants, try changing them and saving the file!
 NAME = "Pythonista"
 NAME_BADGE_COLORS = ALL_COLORS
-LED_BRIGHTNESS = 0.1
 URL = "https://aka.ms/pycon2020"
+LED_BRIGHTNESS = 0.1
+pybadger.pixels.brightness = LED_BRIGHTNESS
 
 
 class PressStart(State):
@@ -43,18 +45,14 @@ class NameBadge(DefaultMenuItemState):
     led_on = True
 
     def display(self):
-        current_color = NAME_BADGE_COLORS[self.current_index % len(NAME_BADGE_COLORS)]
+        self.led_color = NAME_BADGE_COLORS[self.current_index % len(NAME_BADGE_COLORS)]
         pybadger.show_badge(
             name_string=NAME,
-            background_color=current_color,
+            background_color=self.led_color,
             hello_scale=2,
             my_name_is_scale=2,
             name_scale=2,
         )
-
-        if self.led_on:
-            pybadger.pixels.brightness = 0.1
-            pybadger.pixels.fill(current_color)
 
 
 class QrCode(DefaultMenuItemState):
@@ -73,23 +71,23 @@ class SocialBattery(DefaultMenuItemState):
 
     label = "Social Battery Status"
 
-    # TODO make this a named tuple
-    social_images = [
-        ("images/social_battery/full.bmp", (0, 255, 0)),
-        ("images/social_battery/low.bmp", (255, 255, 0)),
-        ("images/social_battery/empty.bmp", (255, 0, 0)),
+    GREEN = (0, 255, 0)
+    YELLOW = (255, 255, 0)
+    RED = (255, 0, 0)
+
+    SocialState = namedtuple("SocialState", ["color", "image"])
+    states = [
+        SocialState(color=RED, image="images/social_battery/empty.bmp"),
+        SocialState(color=YELLOW, image="images/social_battery/low.bmp"),
+        SocialState(color=GREEN, image="images/social_battery/full.bmp"),
     ]
 
     led_on = True
 
     def display(self):
-        image_file, color = self.social_images[
-            self.current_index % len(self.social_images)
-        ]
-        set_splash_screen(image=image_file)
-        if self.led_on:
-            pybadger.pixels.brightness = 0.1
-            pybadger.pixels.fill(color)
+        social_state = self.states[self.current_index % len(self.states)]
+        set_splash_screen(image=social_state.image)
+        self.led_color = social_state.color
 
 
 class EasterEgg(State):
@@ -97,10 +95,9 @@ class EasterEgg(State):
     label = "Easter Egg"
 
     def display(self):
-        pybadger.show_business_card(image_name="images/easter_egg/easter_egg.bmp")
-        # Wait 4 seconds, then return to main state_manager.
-        time.sleep(4.0)
-        state_manager.state = PressStart
+        set_splash_screen(image="images/easter_egg/easter_egg.bmp")
+        time.sleep(4.0)  # Wait 4 seconds, then return to main state_manager.
+        state_manager.previous_state()
 
 
 main_menu = MainMenu(NameBadge, SocialBattery, QrCode, Credits, PressStart)
