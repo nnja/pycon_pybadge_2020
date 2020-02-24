@@ -1,206 +1,139 @@
+# MIT License
+
+# Copyright (c) 2020 Nina Zakharenko
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 import time
+from collections import namedtuple
 
-import displayio
-import terminalio
-
-from adafruit_button import Button
-from adafruit_display_text import label
 from adafruit_pybadger import pybadger
 
-from states import BadgeStates, DefaultMenuItemState, State
-from util import ALL_COLORS, generate_qr_code_display_group
+from states import DefaultMenuItemState, MainMenu, State, StateManager
+from util import ALL_COLORS, display_bg_and_text, generate_qr_code_display_group
+
+# These are constants, try changing them and saving the file!
+NAME = "Pythonista"
+NAME_BADGE_COLORS = ALL_COLORS
+URL = "https://aka.ms/pycon2020"
+LED_BRIGHTNESS = 0.1
+pybadger.pixels.brightness = LED_BRIGHTNESS
 
 
 class PressStart(State):
+
+    label = "Main Screen"
+
     def display(self):
-        pybadger.show_business_card(
-            image_name="images/initial.bmp", email_string_one="press start to begin"
-        )
+        display_bg_and_text(image="images/initial.bmp", text="press start to begin")
 
     def handle_event(self):
         if pybadger.button.start:
-            menu.change_state(BadgeStates.MENU)
+            state_manager.state = MainMenu
         elif pybadger.button.a and pybadger.button.b:
-            menu.change_state(BadgeStates.EASTER_EGG)
+            state_manager.state = EasterEgg
 
 
 class Credits(DefaultMenuItemState):
-    def display(self):
-        pybadger.show_business_card(image_name="images/credits.bmp",)
 
-    def handle_event(self):
-        if self.should_return_to_menu(pybadger.button):
-            menu.change_state(BadgeStates.MENU)
-        super().handle_event()
+    label = "Credits"
+
+    def display(self):
+        display_bg_and_text(image="images/credits.bmp")
 
 
 class NameBadge(DefaultMenuItemState):
 
-    current_index = 0
-    led_on = False
+    label = "Name Badge"
 
-    def __init__(self, colors=ALL_COLORS):
-        self.colors = colors
+    led_on = True
 
     def display(self):
-        current_color = self.colors[self.current_index]
+        self.led_color = NAME_BADGE_COLORS[self.current_index % len(NAME_BADGE_COLORS)]
         pybadger.show_badge(
-            background_color=current_color,
-            name_string="Pythonista",
+            name_string=NAME,
+            background_color=self.led_color,
             hello_scale=2,
             my_name_is_scale=2,
             name_scale=2,
         )
 
-        if self.led_on:
-            pybadger.pixels.brightness = 0.1
-            pybadger.pixels.fill(current_color)
-
-    def handle_event(self):
-        if self.should_return_to_menu(pybadger.button):
-            menu.change_state(BadgeStates.MENU)
-        elif pybadger.button.left or pybadger.button.right:
-            if pybadger.button.left:
-                super().increase_index(self.colors)
-            elif pybadger.button.right:
-                super().decrease_index(self.colors)
-            self.display()
-        super().handle_event()
-
 
 class QrCode(DefaultMenuItemState):
-    def display(self, url="https://aka.ms/pycon2020"):
-        qr_group = generate_qr_code_display_group(url)
-        pybadger.display.show(qr_group)
 
-    def handle_event(self):
-        if self.should_return_to_menu(pybadger.button):
-            menu.change_state(BadgeStates.MENU)
-        super().handle_event()
+    label = "Learn More"
+
+    def __init__(self):
+        self.qr_group = generate_qr_code_display_group(URL)
+        super().__init__()
+
+    def display(self):
+        pybadger.display.show(self.qr_group)
 
 
 class SocialBattery(DefaultMenuItemState):
 
-    social_images = [
-        ("images/social_battery/full.bmp", (0, 255, 0)),
-        ("images/social_battery/low.bmp", (255, 255, 0)),
-        ("images/social_battery/empty.bmp", (255, 0, 0)),
+    label = "Social Battery Status"
+
+    GREEN = (0, 255, 0)
+    YELLOW = (255, 255, 0)
+    RED = (255, 0, 0)
+
+    SocialState = namedtuple("SocialState", ["color", "image"])
+    states = [
+        SocialState(color=RED, image="images/social_battery/empty.bmp"),
+        SocialState(color=YELLOW, image="images/social_battery/low.bmp"),
+        SocialState(color=GREEN, image="images/social_battery/full.bmp"),
     ]
 
-    current_index = 0
     led_on = True
 
     def display(self):
-        image_file, color = self.social_images[self.current_index]
-        pybadger.show_business_card(image_name=image_file)
-        if self.led_on:
-            pybadger.pixels.brightness = 0.1
-            pybadger.pixels.fill(color)
-        else:
-            pybadger.pixels.fill((0, 0, 0))
-
-    def handle_event(self):
-        if self.should_return_to_menu(pybadger.button):
-            menu.change_state(BadgeStates.MENU)
-        elif pybadger.button.left or pybadger.button.right:
-            if pybadger.button.left:
-                super().decrease_index(self.social_images)
-            elif pybadger.button.right:
-                super().increase_index(self.social_images)
-            self.display()
-        super().handle_event()
+        social_state = self.states[self.current_index % len(self.states)]
+        display_bg_and_text(image=social_state.image)
+        self.led_color = social_state.color
 
 
 class EasterEgg(State):
-    def display(self):
-        pybadger.show_business_card(image_name="images/easter_egg/easter_egg.bmp")
-        # Wait 4 seconds, then return to main menu.
-        time.sleep(4.0)
-        menu.change_state(BadgeStates.MAIN_SCREEN)
 
-
-class Menu(State):
-
-    menu_items = [
-        BadgeStates.NAME_BADGE,
-        BadgeStates.SOCIAL_BATTERY,
-        BadgeStates.WEBSITE_QR_CODE,
-        BadgeStates.CREDITS,
-        BadgeStates.MAIN_SCREEN,
-    ]
-
-    def __init__(self):
-        self.current_index = 0
-        self.buttons = []
-
-        self.menu_group = displayio.Group(max_size=6)
-
-        display_height = 120
-        step = int(display_height / (len(self.menu_items) + 1))
-
-        title = Button(
-            x=1,
-            y=0,
-            width=159,
-            height=step,
-            label_color=0xFFFFFF,
-            fill_color=0x000,
-            label="Microsoft PyBadge v1.0",
-            label_font=terminalio.FONT,
-        )
-        self.menu_group.append(title.group)
-
-        for index, menu_item in enumerate(self.menu_items, start=1):
-            button = Button(
-                style=Button.ROUNDRECT,
-                x=1,
-                y=index * step,
-                width=159,
-                height=step,
-                label_color=0xFFFF,
-                outline_color=0x767676,
-                fill_color=0x5C5B5C,
-                selected_fill=0x5A5A5A,
-                selected_outline=0xFF00FF,
-                selected_label=0xFFFF00,
-                label=menu_item,
-                label_font=terminalio.FONT,
-            )
-            if index - 1 == self.current_index:
-                button.selected = True
-            self.menu_group.append(button.group)
-            self.buttons.append(button)
+    label = "Easter Egg"
 
     def display(self):
-        pybadger.display.show(self.menu_group)
-        pybadger.display.refresh()
-
-    def handle_event(self):
-        if pybadger.button.a:
-            menu.change_state(self.menu_items[self.current_index])
-        elif pybadger.button.b:
-            menu.change_state(BadgeStates.MAIN_SCREEN)
-        elif pybadger.button.up or pybadger.button.down:
-            self.buttons[self.current_index].selected = False
-            if pybadger.button.up:
-                self.current_index = (self.current_index - 1) % len(self.menu_items)
-            elif pybadger.button.down:
-                self.current_index = (self.current_index + 1) % len(self.menu_items)
-            self.buttons[self.current_index].selected = True
+        display_bg_and_text(image="images/easter_egg/easter_egg.bmp")
+        time.sleep(4.0)  # Wait 4 seconds, then return to main state_manager.
+        state_manager.previous_state()
 
 
-states = {
-    BadgeStates.MAIN_SCREEN: PressStart(),
-    BadgeStates.MENU: Menu(),
-    BadgeStates.CREDITS: Credits(),
-    BadgeStates.NAME_BADGE: NameBadge(),
-    BadgeStates.WEBSITE_QR_CODE: QrCode(),
-    BadgeStates.SOCIAL_BATTERY: SocialBattery(),
-    BadgeStates.EASTER_EGG: EasterEgg(),
-}
+main_menu = MainMenu(NameBadge, SocialBattery, QrCode, Credits, PressStart)
 
-menu = BadgeStates(states)
+state_manager = StateManager()
+state_manager.add(
+    main_menu,
+    PressStart(),
+    Credits(),
+    NameBadge(),
+    QrCode(),
+    SocialBattery(),
+    EasterEgg(),
+)
+state_manager.state = PressStart
 
 while True:
-    menu.check_for_event()
+    state_manager.check_for_event()
     time.sleep(0.15)  # Debounce
