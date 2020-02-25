@@ -16,6 +16,10 @@ For more CircuitPython projects, stay in touch:
 - [nnja.io](https://nnja.io)
 - [GitHub](https://github.com/nnja)
 
+## In Action
+
+![](https://user-images.githubusercontent.com/2030983/75220946-84cbb200-5755-11ea-9a08-255704fd6345.gif)
+
 ## Getting Started
 
 This code is meant to run on an Adafruit [PyBadge LC](https://www.adafruit.com/product/3939), a compact dev board featuring an ATSAMD51 processor, a color TFT screen with dimmable backlight, a wide assortment of buttons, and one NeoPixel LED.
@@ -27,6 +31,18 @@ To program the board, plug it into your computer with a micro USB cable that **s
 To change the behavior of the board, modify the code in `code.py`. Once it's saved, the latest code will run on the device automatically.
 
 ## The Badge
+
+Turn on the badge by sliding the switch at the top of the board to the "on" position.
+
+### Assembly & Charging
+
+If you got your kit from the Microsoft booth, plug in the battery, then attach the battery with the included piece of double sided tape.
+
+Is your badge not working, even though the battery is plugged in? It may need a charge!
+
+To charge the battery, make sure the battery is plugged in, then plug in a micro USB cable. If everything is plugged in correctly, a yellow charge light on the back of the board will turn on.
+
+### Navigation
 
 To get started from the main screen, press the "start" button on the upper right corner of the badge.
 
