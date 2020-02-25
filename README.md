@@ -24,7 +24,7 @@ For more CircuitPython projects, stay in touch:
 
 This code is meant to run on an Adafruit [PyBadge LC](https://www.adafruit.com/product/3939), a compact dev board featuring an ATSAMD51 processor, a color TFT screen with dimmable backlight, a wide assortment of buttons, and one NeoPixel LED.
 
-It's written in [CircuitPython](https://circuitpython.org/), a variant of Python that can be used to program microcontrollers (Originally forked from [MicroPython](https://github.com/micropython/micropython))
+It's written in [CircuitPython](https://circuitpython.org/), a variant of Python that can be used to program microcontrollers (Originally forked from [MicroPython](https://github.com/micropython/micropython)).
 
 To program the board, plug it into your computer with a micro USB cable that **supports data transfer**. *If you got your PyBadge from the Microsoft booth, use the USB cable from the kit.* Once you plug your board in, it should show up at a `CIRCUITPY` drive.
 
@@ -42,7 +42,7 @@ Is your badge not working, even though the battery is plugged in? It may need a 
 
 To charge the battery, make sure the battery is plugged in, then plug in a micro USB cable. If everything is plugged in correctly, a yellow charge light on the back of the board will turn on.
 
-### Navigation
+## Navigation
 
 To get started from the main screen, press the "start" button on the upper right corner of the badge.
 
@@ -74,7 +74,7 @@ Press the "left" and "right" buttons to switch between background colors.
 
 To turn the LED on, press the "up" button. To turn the LED off, press the "down" button. To make the LED off by default, change the value of `led_on` to `False` in the `NameBadge` class.
 
-To change the brightness of the LED, increase the `LED_BRIGHTNESS` constant from 0.0 to 1.0.
+The brightness of the LED can be changed with the `LED_BRIGHTNESS` constant. The brightness value can be adjusted from 0.0 which is completely off, to 1.0 which is very bright.
 
 #### Social Battery Status
 
@@ -108,7 +108,7 @@ To change the label of a menu item, update the `label` property on its class.
 
 ### Easter Egg
 
-There's an surprise easter egg hidden in the code. Can you find it? 🥚📎✨
+There's a surprise easter egg hidden in the code. Can you find it? 🥚📎✨
 
 ## CircuitPython and Libraries
 
