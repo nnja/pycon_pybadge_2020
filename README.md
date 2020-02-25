@@ -119,7 +119,7 @@ For programming hardware without an IDE [Mu](https://codewith.mu/) is a very sim
 
 This repository is meant to contain a snapshot of the code loaded on the badges at PyCon 2020. Minor fixes and version upgrades will be pushed, but new features will likely not be accepted.
 
-If you make awesome modifications or add new features, please open an issue with a summary, a screenshot, and a link to your repository. Selected screenshots may be listed in a gallery in the future.
+If you made awesome modifications or added new features, please open an issue with a summary, a screenshot, and a link to your repository. Selected screenshots may be listed in a gallery in the future.
 
 ## License & Attributions
 
