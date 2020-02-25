@@ -32,7 +32,7 @@ from util import ALL_COLORS, display_bg_and_text, generate_qr_code_display_group
 NAME = "Pythonista"
 NAME_BADGE_COLORS = ALL_COLORS
 URL = "https://aka.ms/pycon2020"
-LED_BRIGHTNESS = 0.1
+LED_BRIGHTNESS = 0.1  # Dim the brightness of the LEDs to 10%.
 pybadger.pixels.brightness = LED_BRIGHTNESS
 
 
