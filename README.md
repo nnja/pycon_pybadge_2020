@@ -22,7 +22,7 @@ This code is meant to run on an Adafruit [PyBadge LC](https://www.adafruit.com/p
 
 It's written in [CircuitPython](https://circuitpython.org/), a variant of Python that can be used to program microcontrollers (Originally forked from [MicroPython](https://github.com/micropython/micropython))
 
-To program the board, plug it into your computer with a micro USB cable that **supports data transfer**. *If you got your PyBadge from the Microsoft booth, use the USB cable from the kit.* Once you plug your board in, it should show up at a CIRCUITPY drive.
+To program the board, plug it into your computer with a micro USB cable that **supports data transfer**. *If you got your PyBadge from the Microsoft booth, use the USB cable from the kit.* Once you plug your board in, it should show up at a `CIRCUITPY` drive.
 
 To change the behavior of the board, modify the code in `code.py`. Once it's saved, the latest code will run on the device automatically.
 
@@ -68,7 +68,7 @@ The social statuses were originally created for [this project](https://twitter.c
 
 To switch your social status between Full, Low, and Empty, press the "left" and "right' buttons.
 
-To turn the LED on, press the "up" button. To turn the LED off, press the "down" button. To make the LED off by default, change the value of `led_on` to `False` in the `NameBadge` class.
+To turn the LED on, press the "up" button. To turn the LED off, press the "down" button. To make the LED off by default, change the value of `led_on` to `False` in the `SocialBattery` class.
 
 #### Learn More
 
