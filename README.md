@@ -84,7 +84,7 @@ Return to the main menu.
 
 #### Adding Menu Items
 
-To add menu items, create a new class that inherits `DefaultMenuItemState`. Then, pass in your new class when instantiating the `MainMenu`, and add it to the `state_manager` by adding it to the list of states passed into `state_manager.add`.
+To add menu items, create a new class that inherits from `DefaultMenuItemState`. Then, pass in your new class when instantiating the `MainMenu`, and add it to the `state_manager` by adding it to the list of states passed into the call to `state_manager.add()`.
 
 #### Changing Menu Labels
 
@@ -98,7 +98,7 @@ There's an surprise easter egg hidden in the code. Can you find it? 🥚📎✨
 
 ### CircuitPython
 
-This code targets CircuitPython version 5.0.0-beta.5. If you notice bugs or other issues with continued development, try to upgrade your board to the [latest version](https://circuitpython.org/board/pybadge/) by following [these instructions](https://learn.adafruit.com/adafruit-pybadge/installing-circuitpython).
+This code targets CircuitPython version 5.0.0-beta.5. If you notice bugs or other issues with continued development, follow [these instructions](https://learn.adafruit.com/adafruit-pybadge/installing-circuitpython) to upgrade your board to the [latest version](https://circuitpython.org/board/pybadge/).
 
 ### Libraries
 
