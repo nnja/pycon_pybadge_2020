@@ -91,7 +91,7 @@ class MainMenu(State):
         self.current_index = 0
         self.buttons = []
 
-        self.menu_group = displayio.Group(max_size=6)
+        self.menu_group = displayio.Group(max_size=len(self.menu_items) + 1)
 
         display_height = 120
         step = int(display_height / (len(self.menu_items) + 1))
@@ -148,6 +148,7 @@ class MainMenu(State):
 
 
 class StateManager:
+
     current_state = None
 
     def __init__(self):

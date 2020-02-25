@@ -32,7 +32,7 @@ from util import ALL_COLORS, display_bg_and_text, generate_qr_code_display_group
 NAME = "Pythonista"
 NAME_BADGE_COLORS = ALL_COLORS
 URL = "https://aka.ms/pycon2020"
-LED_BRIGHTNESS = 0.1
+LED_BRIGHTNESS = 0.1  # Dim the brightness of the LEDs to 10%.
 pybadger.pixels.brightness = LED_BRIGHTNESS
 
 
@@ -91,18 +91,18 @@ class SocialBattery(DefaultMenuItemState):
 
     label = "Social Battery Status"
 
+    led_on = True
+
     GREEN = (0, 255, 0)
     YELLOW = (255, 255, 0)
     RED = (255, 0, 0)
 
     SocialState = namedtuple("SocialState", ["color", "image"])
     states = [
-        SocialState(color=RED, image="images/social_battery/empty.bmp"),
-        SocialState(color=YELLOW, image="images/social_battery/low.bmp"),
         SocialState(color=GREEN, image="images/social_battery/full.bmp"),
+        SocialState(color=YELLOW, image="images/social_battery/low.bmp"),
+        SocialState(color=RED, image="images/social_battery/empty.bmp"),
     ]
-
-    led_on = True
 
     def display(self):
         social_state = self.states[self.current_index % len(self.states)]
@@ -136,4 +136,4 @@ state_manager.state = PressStart
 
 while True:
     state_manager.check_for_event()
-    time.sleep(0.15)  # Debounce
+    time.sleep(0.15)  # Prevent duplicate button presses.
