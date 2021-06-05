@@ -126,7 +126,7 @@ You may also want to read the [documentation](https://circuitpython.readthedocs.
 
 ## Editing the Code
 
-I used [VS Code](https://code.visualstudio.com/download?WT.mc_id=pycon-github-ninaz) (an awesome IDE with [Python support](https://code.visualstudio.com/docs/languages/python?WT.mc_id=pycon-github-ninaz)) using the [Witch Hazel](https://marketplace.visualstudio.com/items?itemName=TheaFlowers.witch-hazel&WT.mc_id=pycon-github-ninaz) theme for the development of this code.
+I used [VS Code](https://code.visualstudio.com/download?WT.mc_id=python-0000-ninaz) (an awesome IDE with [Python support](https://code.visualstudio.com/docs/languages/python?WT.mc_id=python-0000-ninaz)) using the [Witch Hazel](https://marketplace.visualstudio.com/items?itemName=TheaFlowers.witch-hazel&WT.mc_id=python-0000-ninaz) theme for the development of this code.
 Follow these instructions for connecting to the serial port in the VS Code terminal to view printed output for [Mac/Linux](https://learn.adafruit.com/welcome-to-circuitpython/advanced-serial-console-on-mac-and-linux), and [Windows](https://learn.adafruit.com/welcome-to-circuitpython/advanced-serial-console-on-windows).
 
 For programming hardware without an IDE [Mu](https://codewith.mu/) is a very simple text editor targeted for beginners.
